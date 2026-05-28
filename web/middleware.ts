@@ -1,7 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { homePathForRole } from "@/lib/auth";
+// NOTE: relative import (not "@/lib/auth"). Vercel's Edge middleware bundler
+// does not honour tsconfig path aliases for the middleware entry point —
+// using the alias here fails the deploy with
+//   The Edge Function "middleware" is referencing unsupported modules: @/lib/auth
+import { homePathForRole } from "./lib/auth";
 
 /**
  * Refreshes the Supabase session cookie on every request AND enforces routing:
