@@ -32,6 +32,12 @@ const sansDeva = Noto_Sans_Devanagari({
   display: "swap",
 });
 
+// Every TenderIQ route needs a Supabase session at request time, so opt the
+// whole tree out of Next's static prerender. Without this, `next build`
+// evaluates client modules at build time and trips on the publishable env
+// vars before Vercel has injected them — making CI deploys brittle.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "TenderIQ",
   description:

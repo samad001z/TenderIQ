@@ -1,15 +1,7 @@
 # TenderIQ web → Vercel
 #
-# Two paths supported:
-#   (1) Token mode (preferred for CI / one-shot): set $env:VERCEL_TOKEN first.
-#   (2) Interactive: run `npx vercel login` once, then this script.
-#
-# Either way, the script:
-#   - cds into /web
-#   - sets project env vars (NEXT_PUBLIC_*) pointing at Supabase + Cloud Run
-#   - deploys to production
-#
-# Prerequisite: deploy/deploy-api.ps1 has been run and the Cloud Run URL exists.
+# Prereq: run `npx vercel login` once in your shell (browser auth), OR set
+# $env:VERCEL_TOKEN to a Vercel personal token.
 #
 # Run from C:\bid:
 #   pwsh ./deploy/deploy-web.ps1
@@ -42,30 +34,46 @@ Write-Host "[deploy-web] API URL: $ApiUrl"
 
 Set-Location $WebDir
 
-# Vercel CLI via npx — no global install needed.
-$VercelCmd = "npx --yes vercel@latest"
-$TokenArg  = if ($env:VERCEL_TOKEN) { "--token=$env:VERCEL_TOKEN" } else { "" }
+# Build the vercel argument list once.
+$VercelExe  = "npx"
+$VercelBase = @("--yes", "vercel@latest")
+$TokenArgs  = if ($env:VERCEL_TOKEN) { @("--token=$($env:VERCEL_TOKEN)") } else { @() }
+
+function Run-Vercel {
+    param([string[]]$Args, [string]$StdinValue = $null)
+    $allArgs = $VercelBase + $Args + $TokenArgs
+    if ($null -ne $StdinValue) {
+        $StdinValue | & $VercelExe @allArgs
+    } else {
+        & $VercelExe @allArgs
+    }
+}
 
 # --- Link the project (creates .vercel/project.json) ---
 if (-not (Test-Path ".vercel/project.json")) {
     Write-Host "[deploy-web] Linking Vercel project (one-time)..."
-    Invoke-Expression "$VercelCmd link --yes $TokenArg"
+    Run-Vercel @("link", "--yes")
 }
 
 # --- Push env vars (production scope) ---
-function Set-VercelEnv($key, $value) {
-    # `vercel env add` is interactive without --force; remove then add.
-    Invoke-Expression "$VercelCmd env rm $key production --yes $TokenArg 2>$null" | Out-Null
-    $value | Invoke-Expression "$VercelCmd env add $key production $TokenArg"
+function Set-VercelEnv {
+    param([string]$Key, [string]$Value)
+    # Remove existing first; ignore failure if the var doesn't exist yet.
+    try {
+        Run-Vercel @("env", "rm", $Key, "production", "--yes") 2>$null | Out-Null
+    } catch { }
+    Run-Vercel @("env", "add", $Key, "production") $Value | Out-Null
+    Write-Host "  + $Key"
 }
-Write-Host "[deploy-web] Pushing env vars..."
+
+Write-Host "[deploy-web] Pushing env vars to production scope..."
 Set-VercelEnv "NEXT_PUBLIC_SUPABASE_URL"      $SupabaseUrl
 Set-VercelEnv "NEXT_PUBLIC_SUPABASE_ANON_KEY" $SupabaseAnon
 Set-VercelEnv "NEXT_PUBLIC_API_BASE_URL"      $ApiUrl
 
 # --- Deploy to production ---
 Write-Host "[deploy-web] Deploying to production..."
-$Url = Invoke-Expression "$VercelCmd deploy --prod --yes $TokenArg"
+$Url = Run-Vercel @("deploy", "--prod", "--yes")
 Write-Host ""
 Write-Host "[deploy-web] SUCCESS"
 Write-Host "  Web URL : $Url"
