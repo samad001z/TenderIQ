@@ -1,0 +1,34 @@
+{
+  "registry_name": "CVC / Department of Expenditure — Debarred & Blacklisted Firms Registry (seeded demo data)",
+  "as_on": "2026-05-01",
+  "header": "CVC Debarred & Blacklisted Firms Registry — consolidated list as on 01-05-2026 (seeded demo data).",
+  "entries": [
+    {
+      "name": "Galaxy Constructions Pvt Ltd",
+      "aliases": ["Galaxy Constructions", "Galaxy Infra"],
+      "reason": "Debarred for 2 years for submission of forged experience certificates (CVC ref. 2024/VGL/0147).",
+      "debarred_until": "2026-12-31",
+      "authority": "Ministry of Road Transport & Highways",
+      "page": 3,
+      "listing": "3. Galaxy Constructions Pvt Ltd — debarred for 2 years w.e.f. 01-01-2025 for forged experience certificates. Ref: CVC/2024/VGL/0147."
+    },
+    {
+      "name": "Vanguard Infraprojects Ltd",
+      "aliases": ["Vanguard Infra", "Vanguard Infraprojects"],
+      "reason": "Banned for 3 years for cartel/bid-rigging under CCI Order No. 09 of 2023.",
+      "debarred_until": "2027-06-30",
+      "authority": "Competition Commission of India",
+      "page": 5,
+      "listing": "5. Vanguard Infraprojects Ltd — banned for 3 years w.e.f. 01-07-2024 for bid-rigging. Ref: CCI Order No. 09 of 2023."
+    },
+    {
+      "name": "Sterling Systems & Solutions Pvt Ltd",
+      "aliases": ["Sterling Systems", "Sterling Solutions"],
+      "reason": "Debarred for 1 year for abandonment of an awarded contract and EMD forfeiture.",
+      "debarred_until": "2026-09-30",
+      "authority": "GeM",
+      "page": 7,
+      "listing": "7. Sterling Systems & Solutions Pvt Ltd — debarred 1 year w.e.f. 01-10-2025 for contract abandonment. Ref: GeM/SD/2025/2210."
+    }
+  ]
+}

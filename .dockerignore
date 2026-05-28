@@ -1,0 +1,40 @@
+# Build context is the repo root — keep only /api, /shared, and Dockerfile.
+.git/
+.gitignore
+.env
+.env.local
+.env.*.local
+.env.example
+gcp-key.json
+*-key.json
+*.pem
+.idea/
+.vscode/
+.claude/
+
+# /web is not used by the API image
+web/
+
+# Tests / docs / migrations aren't needed at runtime
+tests/
+docs/
+supabase/
+
+# Python caches
+**/__pycache__/
+**/*.py[cod]
+**/*.egg-info/
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+**/.venv/
+
+# Node (just in case)
+**/node_modules/
+**/.next/
+
+# Deploy scripts
+deploy/
+
+# Logs
+**/*.log
