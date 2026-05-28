@@ -31,9 +31,15 @@ CLI as the pair-programmer.
 
 | Surface | URL |
 | --- | --- |
-| **Web app (Vercel)** | _populated after `pwsh ./deploy/deploy-web.ps1`_ — paste the printed URL here once it's published |
+| **Web app (Vercel)** | https://tender-iq-mu.vercel.app |
 | **API (Google Cloud Run, Mumbai)** | https://tenderiq-api-258401798733.asia-south1.run.app — `/health` and `/test-gemini` are live |
 | **Source** | https://github.com/samad001z/TenderIQ |
+
+> **Deployment Protection on Vercel:** If `tender-iq-mu.vercel.app` returns
+> a 404 NOT_FOUND, Vercel Authentication is enabled for production on the
+> project. Go to *Project → Settings → Deployment Protection → Vercel
+> Authentication* and set it to **Only Preview Deployments** (or disable
+> it entirely), then save. The 404 disappears instantly — no redeploy.
 
 > If you're cloning this repo and want it running on your own infrastructure,
 > jump to [Local development](#local-development) → [Production deployment](#production-deployment).
