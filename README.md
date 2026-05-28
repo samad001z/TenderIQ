@@ -441,7 +441,38 @@ This script:
    concurrency 20, max 3 instances, 600 s timeout for the SSE review stream).
 6. Prints the public `https://tenderiq-api-...run.app` URL.
 
-### Step 2 — Deploy the web to Vercel
+### Step 2 — Deploy the web to Vercel (manual, dashboard)
+
+This is the path that works every time. Five minutes, no CLI.
+
+1. Open https://vercel.com/new and click **Import** next to
+   **samad001z/TenderIQ**.
+2. **Configure Project**:
+   - **Framework Preset:** Next.js (auto-detected)
+   - **Root Directory:** `web` (click *Edit* and pick the `web` folder)
+   - **Build & Output Settings:** leave defaults
+3. **Environment Variables** — click *Add* three times and paste:
+
+   | Name | Value |
+   | --- | --- |
+   | `NEXT_PUBLIC_SUPABASE_URL` | from `.env.local` (your Supabase project URL) |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | from `.env.local` (the `sb_publishable_...` value) |
+   | `NEXT_PUBLIC_API_BASE_URL` | `https://tenderiq-api-258401798733.asia-south1.run.app` |
+
+   All three are safe for the browser bundle (Row-Level Security enforces
+   access on the Supabase side).
+
+4. Hit **Deploy**. First build takes ~90 seconds.
+
+> The repo is already pre-fixed for Vercel:
+> - `/shared/citation.ts` is duplicated into `/web/shared/citation.ts` so the
+>   `@shared/*` path alias resolves inside the build root.
+> - `app/layout.tsx` declares `export const dynamic = "force-dynamic"`, so
+>   Next's static prerender step doesn't evaluate Supabase modules at build
+>   time. (Without this, missing env vars would trip the prerender even
+>   though every route is a client component.)
+
+### Step 2 (alternative) — Deploy via the CLI
 
 ```pwsh
 # One-time only — opens your browser for the Vercel login
@@ -451,18 +482,8 @@ npx vercel login
 pwsh ./deploy/deploy-web.ps1
 ```
 
-The script:
-
-1. Reads `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` from
-   `.env.local`.
-2. Looks up the Cloud Run URL from step 1 (via `gcloud run services describe`).
-3. Pushes the three env vars to Vercel (`NEXT_PUBLIC_SUPABASE_URL`,
-   `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_API_BASE_URL`).
-4. Runs `vercel deploy --prod`.
-5. Prints the Vercel URL.
-
-> Alternatively, in CI: set `$env:VERCEL_TOKEN` first (e.g. from
-> https://vercel.com/account/tokens) and the script runs non-interactively.
+In CI: set `$env:VERCEL_TOKEN` first (https://vercel.com/account/tokens) and
+the script runs non-interactively.
 
 ### Step 3 — Tighten CORS on the API
 
