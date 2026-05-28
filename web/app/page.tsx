@@ -27,6 +27,11 @@ import { createClient } from "@/lib/supabase/server";
  *  CTA. The visual language matches the officer workspace (gov-light, tricolor,
  *  navy + saffron accents) so a visitor lands on the same portal they'll work in.
  */
+// Hits cookies/auth on every request — must run dynamically. Scoped here
+// so the root layout stays static-eligible (otherwise next/font/google's
+// __dirname usage leaks into the Edge middleware bundle).
+export const dynamic = "force-dynamic";
+
 export default async function Root() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

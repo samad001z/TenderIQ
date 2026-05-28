@@ -1,5 +1,12 @@
 import type { ReactNode } from "react";
 
+// Auth pages render a Supabase browser client in their effects; opt them out
+// of Next's static prerender so missing build-time env vars don't break the
+// Vercel build. Scoped here (not on the root layout) to keep `next/font/google`
+// in the static side of the build — otherwise its `__dirname` usage gets
+// pulled into the Edge middleware bundle and crashes at runtime.
+export const dynamic = "force-dynamic";
+
 /** Linear-style two-pane auth shell: obsidian brand pane + form pane. */
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
