@@ -82,6 +82,79 @@ Sign in with any of these to see the bidder workspace — your already-submitted
 bid, the eligibility & compliance pre-checks, and the comparison once the
 officer has run the review.
 
+### Where the bidder PDFs live
+
+All 14 demo bid PDFs (7 bidders × technical + financial) are committed to
+the repo and seeded against the demo tender in Supabase Storage.
+
+```
+tests/synthetic_bids/
+├── stellartech_technical.pdf   25 pages   140 KB   →  AWARD persona
+├── stellartech_financial.pdf    3 pages   103 KB
+├── velocity_technical.pdf      25 pages   138 KB   →  DISAGREEMENT (OEM/MAF missing)
+├── velocity_financial.pdf       3 pages   103 KB
+├── budgetbuild_technical.pdf   25 pages   137 KB   →  REJECT (Class-II + BIS missing + abnormally low)
+├── budgetbuild_financial.pdf    3 pages   103 KB
+├── shadowbuild_technical.pdf   25 pages   137 KB   →  REJECT + DUPLICATE FLAG
+├── shadowbuild_financial.pdf    3 pages   103 KB
+├── meridian_technical.pdf      25 pages   140 KB   →  CARTEL CLUSTER member
+├── meridian_financial.pdf       3 pages   103 KB
+├── orbit_technical.pdf         25 pages   140 KB   →  CARTEL CLUSTER member
+├── orbit_financial.pdf          3 pages   103 KB
+├── nexus_technical.pdf         25 pages   140 KB   →  CARTEL CLUSTER member
+└── nexus_financial.pdf          3 pages   103 KB
+```
+
+GitHub direct link: https://github.com/samad001z/TenderIQ/tree/main/tests/synthetic_bids
+
+When you sign in as an officer and open the seeded *System Integrator —
+Package B* tender, the PDFs you'll see in the bidder column are uploaded
+copies of these exact files (in Supabase Storage at
+`bidder-docs/{bid_id}/technical.pdf` and `.../financial.pdf`).
+
+### What's on each page of a technical bid (~25 pp)
+
+The generator (`api/scripts/generate_synthetic_bids.py`) lays out every bid
+to mirror a real CPPP / GeM submission. Every page is born-digital so
+PyMuPDF extracts verbatim text and the agents can quote it directly.
+
+| Page | Section | Why the agents care |
+| --- | --- | --- |
+| 1 | Cover + Executive Summary | Tender reference, bidder name, quoted price |
+| 2 | Index of enclosed documents | 25-row table of contents |
+| 3 | Bidder Profile & Statutory IDs | GSTIN, PAN, CIN, registered office, signatory |
+| 4 | **GST REG-06** | Form GST REG-06 (Rule 10(1) CGST Rules 2017) — GSTIN, type of registration, approving authority |
+| 5 | **PAN + ITR-V (AY 2024-25)** | PAN, ITR-6 acknowledgement, DSC-verified, income returned, tax paid |
+| 6 | **CA-certified turnover** | 3-FY audited turnover signed by CA (UDIN included) — *eligibility floor: ≥ ₹15 cr* |
+| 7-9 | Past performance × 3 | Completion certificates with client, scope, value (₹ cr), period |
+| 10 | **ISO 9001:2015** | BSI India cert no. + NABCB / UKAS accreditation refs |
+| 11 | **ISO/IEC 27001:2022** | TÜV SÜD cert no. + NABCB / IAS / UKAS accreditation |
+| 12 | **CMMI-DEV Level 5** | PARS appraisal ID + SCAMPI Class A + lead appraiser reg no. |
+| 13 | Technical approach — architecture | Solution architecture narrative |
+| 14 | Technical approach — methodology | Sprint plan, RAID log, quality gates |
+| 15 | Team & key personnel | Team strength, PMP-certified leads |
+| 16 | **PPP-MII Class-I self-cert** | DPIIT P-45021/2/2017-PP — local content %, Class-I vs Class-II |
+| 17 | **CVC Integrity Pact** | Full pact text: bidder commitments, no-cartel clause, debarment penalties |
+| 18 | **EMD bank receipt** | UTR, bank, sender, beneficiary MeitY, RBI IFSC, date, status SUCCESS |
+| 19-21 | **OEM MAF letters × 3** | Dell, Cisco, Microsoft — letter no., date, signatory, scope |
+| 22 | **BIS licence** | Standard Mark Licence (IS 15700:2018), Western Regional Office Mumbai |
+| 23 | **Non-blacklisting affidavit** | Rs 100 stamp-paper format, 5 sworn clauses, notarised |
+| 24 | **Power of Attorney** | Board resolution, signatory powers, Chairperson + Co. Sec. signatures |
+| 25 | Declarations & signature | Final sign-off |
+
+Each agent quotes the **exact sentence** off the **exact page** that
+triggered its verdict. Open the comparison matrix in the officer review
+and click any citation pill — the PDF viewer jumps to that page with the
+sentence highlighted.
+
+### Regenerating the PDFs
+
+```bash
+cd api
+uv run python scripts/generate_synthetic_bids.py    # writes 14 PDFs to tests/synthetic_bids/
+uv run python scripts/seed_synthetic_bids.py        # uploads them to Supabase + recreates the 7 bid rows
+```
+
 ---
 
 ## 60-second guided tour
