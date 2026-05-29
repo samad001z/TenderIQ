@@ -29,17 +29,24 @@ CLI as the pair-programmer.
 
 ## Live URLs
 
-| Surface | URL |
-| --- | --- |
-| **Web app (Vercel)** | https://tender-iq-mu.vercel.app |
-| **API (Google Cloud Run, Mumbai)** | https://tenderiq-api-258401798733.asia-south1.run.app — `/health` and `/test-gemini` are live |
-| **Source** | https://github.com/samad001z/TenderIQ |
+| Surface | URL | Status |
+| --- | --- | --- |
+| **Web app** | https://tender-iq-mu.vercel.app | live (200 OK, 82.9 KB landing page) |
+| **API** | https://tenderiq-api-258401798733.asia-south1.run.app | `/health` 200, `/test-gemini` 200 (Vertex ADC working) |
+| **Source** | https://github.com/samad001z/TenderIQ | 8 commits on `main` |
 
-> **Deployment Protection on Vercel:** If `tender-iq-mu.vercel.app` returns
-> a 404 NOT_FOUND, Vercel Authentication is enabled for production on the
-> project. Go to *Project → Settings → Deployment Protection → Vercel
-> Authentication* and set it to **Only Preview Deployments** (or disable
-> it entirely), then save. The 404 disappears instantly — no redeploy.
+End-to-end verified — landing page renders the TenderIQ marketing layout,
+the API reachable from the web origin, CORS is locked to the Vercel domains
++ `http://localhost:3000`. Sign in at `/login` with `officer@tenderiq.test`
+/ `TenderIQ#2026` to drive the demo.
+
+> **Vercel framework gotcha (root cause of the original 404 chain):** the
+> Vercel project's `framework` field was an empty string after the dashboard
+> import, so every build ran `next build` but Vercel's deploy step did not
+> recognise the Next.js output — it produced deployments with `builds: 0,
+> routes: 0`, which serve 404 on every path. Fixed by committing
+> `web/vercel.json` pinning `"framework": "nextjs"` and PATCH'ing the
+> project's framework field via Vercel's API.
 
 > If you're cloning this repo and want it running on your own infrastructure,
 > jump to [Local development](#local-development) → [Production deployment](#production-deployment).
